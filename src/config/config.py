@@ -1,3 +1,4 @@
+import os
 from os import getenv
 from dotenv import load_dotenv
 
@@ -5,7 +6,7 @@ load_dotenv()
 
 class bot:
     token = getenv("DISCORD_TOKEN")
-    default_prefix = "t."
+    default_prefix = '!'
     api = True
     owner_ids = {int(x.strip()) for x in getenv("OWNER_ID", "").split(",") if x.strip()}
     default_status = "CFC bot"
@@ -13,6 +14,16 @@ class bot:
         "tools",
         "jishaku",
     ]
+
+    # Get current working directory
+    current_dir = os.getcwd()
+
+    # Build path to "cogs" inside parent
+    cogs_path = os.path.join(current_dir, "src/cogs")
+
+    for command in os.listdir(cogs_path):
+        if command not in cogs:
+            cogs.append(command)
     
     support_invite = "https://discord.gg/dn2dpgCbXP"
     invite_link = ""
@@ -22,7 +33,7 @@ class bot:
 class database:
     token = getenv("DB_CONFIG")
     db_name = "cfc_bot"
-  
+
 class server:
     host = str(getenv("SERVER_HOST"))
     port = int(getenv("SERVER_PORT"))
