@@ -202,7 +202,7 @@ class ChannelPermissionsSelect(discord.ui.Select):
             )
 
 
-class VoiceMasterDropdownView(discord.ui.View):
+class VoiceDropdownView(discord.ui.View):
     """Persistent view with settings & permissions dropdowns + utility buttons."""
 
     def __init__(self, bot):

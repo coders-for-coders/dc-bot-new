@@ -4,16 +4,16 @@ from discord.ext import commands
 
 from core.cog import Cog
 from core.bot import MyBot
-from .views import VoiceMasterDropdownView
+from .views import VoiceDropdownView
 
 
 class Voice(Cog):
-    """VoiceMaster — temporary voice channel creation & management."""
+    """Temporary voice channel creation & management."""
 
     def __init__(self, bot: MyBot):
         self.bot = bot
         # Register the persistent view so buttons/selects survive restarts
-        self.bot.add_view(VoiceMasterDropdownView(self.bot))
+        self.bot.add_view(VoiceDropdownView(self.bot))
 
     # ── Listener ───────────────────────────────────────────────────────
 
@@ -77,7 +77,7 @@ class Voice(Cog):
                 {"user_id": member.id, "voice_id": channel.id}
             )
 
-            # Send the VoiceMaster control panel embed
+            # Send the control panel embed
             embed = discord.Embed(
                 title="⚙️ Welcome to your own temporary voice channel",
                 description=(
@@ -88,7 +88,7 @@ class Voice(Cog):
                     "**Channel Permissions**\n"
                     "━━━━━━━━━━━━━━━━━━━━\n"
                     "Modify your channel permissions using the menu below.\n\n"
-                    "**Gold options require VoiceMaster+ or voting**"
+                    "**Gold options require voting**"
                 ),
                 color=0x5865F2,
             )
@@ -98,7 +98,7 @@ class Voice(Cog):
             )
 
             try:
-                await channel.send(embed=embed, view=VoiceMasterDropdownView(self.bot))
+                await channel.send(embed=embed, view=VoiceDropdownView(self.bot))
             except Exception as e:
                 self.bot.logger.error(f"[Voice] Error sending interface: {e}")
 
@@ -118,12 +118,12 @@ class Voice(Cog):
 
     @commands.group()
     async def voice(self, ctx: commands.Context):
-        """VoiceMaster commands."""
+        """Voice commands."""
         pass
 
     @voice.command()
     async def setup(self, ctx: commands.Context):
-        """Set up VoiceMaster for this server (server owner only)."""
+        """Set up Voice system for this server (server owner only)."""
         if ctx.author.id != ctx.guild.owner_id and ctx.author.id not in self.bot.owner_ids:
             return await ctx.send(f"{ctx.author.mention} only the owner of the server can setup the bot!")
 
