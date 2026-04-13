@@ -21,10 +21,22 @@ class bot:
     # Build path to "cogs" inside parent
     cogs_path = os.path.join(current_dir, "src/cogs")
 
+    # List of files/folders to exclude
+    exclude = {"__pycache__", "__init__.py"}
+
     for command in os.listdir(cogs_path):
+
+        full_path = os.path.join(cogs_path, command)
+
+        if not os.path.isdir(full_path):
+            continue
+
+        if command in exclude:
+            continue        
+
         if command not in cogs:
             cogs.append(command)
-    
+
     support_invite = "https://discord.gg/dn2dpgCbXP"
     invite_link = ""
     vote_link = ""
