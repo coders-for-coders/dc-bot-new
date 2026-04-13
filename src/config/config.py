@@ -11,6 +11,7 @@ class bot:
     default_status = "CFC bot"
     cogs = [
         "tools",
+        "voice",
         "jishaku",
     ]
     
