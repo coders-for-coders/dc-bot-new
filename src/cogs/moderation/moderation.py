@@ -7,8 +7,7 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.hybrid_command(name="purge", description="Purge messages or delete N messages from a specific user.")
-    
+    @commands.hybrid_command(name="purge", description="Purge messages or delete N messages from a specific user.") 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
     async def purge(

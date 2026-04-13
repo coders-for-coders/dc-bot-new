@@ -7,9 +7,17 @@ class Games(commands.Cog):
 
     @commands.command(name="dice", description="Roll dice like 2d6")
     async def dice(self, ctx: commands.Context, dice: str = "1d6"):
-        rolls, limit = map(int, dice.lower().split("d"))
-        results = [random.randint(1, limit) for _ in range(rolls)]
-        await ctx.send(f"🎲 Rolled {dice}: {', '.join(map(str, results))}")
+        try:
+            rolls, limit = map(int, dice.lower().split("d"))
+
+            if rolls <= 0 or limit <= 0:
+                return await ctx.send("Please use positive numbers, e.g. `2d6`.")
+
+            results = [random.randint(1, limit) for _ in range(rolls)]
+            await ctx.send(f"🎲 Rolled {dice}: {', '.join(map(str, results))}")
+
+        except ValueError:
+            await ctx.send("Invalid format! Use NdM (e.g. `2d6`).")
 
 
     @commands.command(name="coinflip", aliases= ["cf"], description="Flip a coin and optionally guess the result")

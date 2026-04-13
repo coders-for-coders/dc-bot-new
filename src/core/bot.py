@@ -40,7 +40,7 @@ class MyBot(commands.Bot):
             elif isinstance(error, commands.MissingPermissions):
                 message = "You are missing the required permissions to run this command!"
             elif isinstance(error, commands.UserInputError):
-                message = message = str(error) or "Something about your input was wrong, please check your input and try again!"
+                message = str(error) or "Something about your input was wrong, please check your input and try again!"
             else:
                 message = "Oh no! Something went wrong while running the command!"
                 print(error)
