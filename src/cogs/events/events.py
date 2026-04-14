@@ -7,9 +7,6 @@ import time
 class Events(Cog):
     def __init__(self, bot: MyBot):
         self.bot = bot
-        self.cooldowns = {}
-        self.check_nodes.start()
-        self.leave_tasks = {}
 
 
     @Cog.listener("on_ready")
