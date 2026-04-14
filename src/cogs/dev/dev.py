@@ -64,3 +64,42 @@ class Dev(Cog):
 
         yes_btn.callback = yes_callback
         no_btn.callback = no_callback
+
+
+    @commands.command()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.is_owner()
+    async def sync(self, ctx: commands.Context):
+
+        yes_btn = Button(
+            label="Yes",
+            style=discord.ButtonStyle.green
+        )
+        no_btn = Button(
+            label="No",
+            style=discord.ButtonStyle.red
+        )
+        view = View(timeout=None)
+        view.add_item(yes_btn)
+        view.add_item(no_btn)
+
+        msg: discord.Message = await ctx.send("> Confirm Sync?", view=view, delete_after=60)
+
+        async def yes_callback(interaction: discord.Interaction):
+
+            await interaction.response.defer()
+
+            try:
+                await self.bot.tree.sync()
+                await interaction.followup.send("Synced")
+            except Exception as e:
+                await interaction.followup.send(f"Something went wrong: {e}")
+
+        async def no_callback(interaction: discord.Interaction):
+
+            await interaction.response.defer()
+            await msg.delete()
+            await ctx.send("Sync cancelled.", delete_after=5)
+
+        yes_btn.callback = yes_callback
+        no_btn.callback = no_callback

@@ -13,6 +13,8 @@ class bot:
         "tools",
         "voice",
         "jishaku",
+        "dev",
+        "events"
     ]
     
     support_invite = "https://discord.gg/dn2dpgCbXP"
