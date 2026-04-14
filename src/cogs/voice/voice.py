@@ -2,6 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 
+import config
 from core.cog import Cog
 from core.bot import MyBot
 from .views import VoiceDropdownView
@@ -12,6 +13,7 @@ class Voice(Cog):
 
     def __init__(self, bot: MyBot):
         self.bot = bot
+        self.emoji = config.emoji.cog_voice
         # Register the persistent view so buttons/selects survive restarts
         self.bot.add_view(VoiceDropdownView(self.bot))
 

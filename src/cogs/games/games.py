@@ -1,9 +1,11 @@
 import random
 from discord.ext import commands
+import config
 
 class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.emoji = config.emoji.cog_games
 
     @commands.command(name="dice", description="Roll dice like 2d6")
     async def dice(self, ctx: commands.Context, dice: str = "1d6"):
@@ -64,6 +66,3 @@ class Games(commands.Cog):
         else:
             result = "I win!"
         await ctx.send(f"You chose **{choice}**, I chose **{bot_choice}**. {result}")
-
-async def setup(bot):
-    await bot.add_cog(Games(bot))

@@ -1,4 +1,3 @@
-import os
 from os import getenv
 from dotenv import load_dotenv
 
@@ -6,7 +5,7 @@ load_dotenv()
 
 class bot:
     token = getenv("DISCORD_TOKEN")
-    default_prefix = '!'
+    default_prefix = "t."
     api = True
     owner_ids = {int(x.strip()) for x in getenv("OWNER_ID", "").split(",") if x.strip()}
     default_status = "CFC bot"
@@ -15,31 +14,10 @@ class bot:
         "voice",
         "jishaku",
         "dev",
-        "events"
+        "events",
+        "games"
     ]
-
-    # Get current working directory
-    current_dir = os.getcwd()
-
-    # Build path to "cogs" inside parent
-    cogs_path = os.path.join(current_dir, "src/cogs")
-
-    # List of files/folders to exclude
-    exclude = {"__pycache__", "__init__.py"}
-
-    for command in os.listdir(cogs_path):
-
-        full_path = os.path.join(cogs_path, command)
-
-        if not os.path.isdir(full_path):
-            continue
-
-        if command in exclude:
-            continue        
-
-        if command not in cogs:
-            cogs.append(command)
-
+    
     support_invite = "https://discord.gg/dn2dpgCbXP"
     invite_link = ""
     vote_link = ""
@@ -48,7 +26,7 @@ class bot:
 class database:
     token = getenv("DB_CONFIG")
     db_name = "cfc_bot"
-
+  
 class server:
     host = str(getenv("SERVER_HOST"))
     port = int(getenv("SERVER_PORT"))
@@ -67,7 +45,10 @@ class emoji:
 
     cog_admin = "<:admin:1262364323666202714>"
     cog_help = "<:help:1262364412497498164>"
-    cog_tools = "<:tool:1254019437854588999>" 
+    cog_tools = "<:tool:1254019437854588999>"
+    cog_games = "" 
+    cog_voice = ""
+    cog_dev = "" 
 
 class loging_channels:
     join = 1206246727116521504
@@ -79,4 +60,3 @@ class loging_channels:
 
 class color:
     no_color = 0x2c2c34
-

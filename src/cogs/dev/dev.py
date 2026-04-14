@@ -6,11 +6,12 @@ import time
 import subprocess
 from discord.ui import View, Button
 import json
-
+import config
 
 class Dev(Cog):
     def __init__(self, bot: MyBot):
         self.bot = bot
+        self.emoji = config.emoji.cog_dev
 
     @commands.command()
     @commands.cooldown(1, 10, commands.BucketType.user)
