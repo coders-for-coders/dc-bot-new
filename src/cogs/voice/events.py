@@ -20,7 +20,7 @@ class VoiceEvents(Cog):
     ):
         guild_id = member.guild.id
 
-        guild_doc = await self.bot.db["voice_guilds"].find_one({"guild_id": guild_id})
+        guild_doc = self.bot.voice_guilds_cache.get(guild_id)
         if guild_doc is None:
             return
 
@@ -29,17 +29,6 @@ class VoiceEvents(Cog):
         try:
             if after.channel is None or after.channel.id != voice_channel_id:
                 return
-
-            # Check cooldown — user already has a temp channel
-            existing = await self.bot.db["voice_channels"].find_one({"user_id": member.id})
-            if existing:
-                try:
-                    await member.send(
-                        "Creating channels too quickly — you've been put on a 15 second cooldown!"
-                    )
-                except discord.Forbidden:
-                    pass
-                await asyncio.sleep(15)
 
             # Fetch guild settings
             category_id = guild_doc["voice_category_id"]

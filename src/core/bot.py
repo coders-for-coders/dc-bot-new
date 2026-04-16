@@ -30,6 +30,7 @@ class MyBot(commands.Bot):
         self.ping_cache = {"ping":"pong"}
 
         self.np_cache = {}
+        self.voice_guilds_cache = {}
 
 
     async def on_command_error(self, ctx: commands.Context, error):
@@ -87,6 +88,15 @@ class MyBot(commands.Bot):
         data = await self.db["np"].find({}).to_list()
         for entry in data:
             self.np_cache[entry["uid"]] = "np"
+            
+        # Load voice guilds cache
+        voice_guilds_data = await self.db["voice_guilds"].find({}).to_list()
+        for entry in voice_guilds_data:
+            self.voice_guilds_cache[entry["guild_id"]] = {
+                "voice_channel_id": entry["voice_channel_id"],
+                "voice_category_id": entry["voice_category_id"]
+            }
+        self.logger.info("Loaded voice guilds cache")
 
 
 
