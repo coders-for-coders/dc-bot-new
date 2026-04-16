@@ -162,3 +162,43 @@ class RegionModal(discord.ui.Modal, title="Set Channel Region"):
             await interaction.response.send_message(
                 "Invalid region!", ephemeral=True
             )
+
+class SetupModal(discord.ui.Modal, title="Voice Setup"):
+    category_name = discord.ui.TextInput(
+        label="Category Name",
+        placeholder="e.g Voice Channels",
+        min_length=1,
+        max_length=100,
+    )
+    channel_name = discord.ui.TextInput(
+        label="Voice Channel Name",
+        placeholder="e.g Join To Create",
+        min_length=1,
+        max_length=100,
+    )
+
+    def __init__(self, bot):
+        super().__init__()
+        self.bot = bot
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        guild = interaction.guild
+        try:
+            new_cat = await guild.create_category_channel(self.category_name.value)
+            channel = await guild.create_voice_channel(self.channel_name.value, category=new_cat)
+
+            await self.bot.db["voice_guilds"].update_one(
+                {"guild_id": guild.id},
+                {
+                    "$set": {
+                        "guild_id": guild.id,
+                        "voice_channel_id": channel.id,
+                        "voice_category_id": new_cat.id,
+                    }
+                },
+                upsert=True,
+            )
+            await interaction.followup.send("**You are all setup and ready to go!**")
+        except Exception:
+            await interaction.followup.send("You didn't enter the names properly.\nUse the setup command again!")

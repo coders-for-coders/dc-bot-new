@@ -15,13 +15,17 @@ class bot:
         "jishaku",
         "dev",
         "events",
-        "games"
+        "help"
+        # "games"
     ]
     
     support_invite = "https://discord.gg/dn2dpgCbXP"
     invite_link = ""
     vote_link = ""
     website = "https://codersforcoders.xyz"
+
+class help:
+    ignored_cogs = ["Dev", "Events", "Jishaku", "Error", "VoiceEvents"]
 
 class database:
     token = getenv("DB_CONFIG")
@@ -46,9 +50,10 @@ class emoji:
     cog_admin = "<:admin:1262364323666202714>"
     cog_help = "<:help:1262364412497498164>"
     cog_tools = "<:tool:1254019437854588999>"
-    cog_games = "" 
-    cog_voice = ""
+    cog_games = "<:Minecraft:1277279364316139601>" 
+    cog_voice = "<:voice:1494090963256086649>"
     cog_dev = "" 
+    cog_help = "<:help:1262364412497498164>"
 
 class loging_channels:
     join = 1206246727116521504

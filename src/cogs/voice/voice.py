@@ -18,65 +18,27 @@ class Voice(Cog):
         self.bot.add_view(VoiceDropdownView(self.bot))
 
 
-    @commands.group()
+    @commands.group(name="voice", description="Voice commands.")
     async def voice(self, ctx: commands.Context):
-        """Voice commands."""
         pass
 
-    @voice.command()
+    @voice.command(name="setup", description="Set up Voice system for the server")
     async def setup(self, ctx: commands.Context):
-        """Set up Voice system for this server (server owner only)."""
-        if ctx.author.id != ctx.guild.owner_id and ctx.author.id not in self.bot.owner_ids:
-            return await ctx.send(f"{ctx.author.mention} only the owner of the server can setup the bot!")
+        from .views import SetupView
+        
+        if not ctx.author.guild_permissions.administrator:
+            return await ctx.send(f"{ctx.author.mention} only server administrators can setup the bot!")
 
-        def check(m):
-            return m.author.id == ctx.author.id
-
-        await ctx.send("**You have 60 seconds to answer each question!**")
-        await ctx.send("**Enter the name of the category you wish to create the channels in: (e.g Voice Channels)**")
-
-        try:
-            category_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
-        except asyncio.TimeoutError:
-            return await ctx.send("Took too long to answer!")
-
-        new_cat = await ctx.guild.create_category_channel(category_msg.content)
-
-        await ctx.send("**Enter the name of the voice channel: (e.g Join To Create)**")
-
-        try:
-            channel_msg = await self.bot.wait_for("message", check=check, timeout=60.0)
-        except asyncio.TimeoutError:
-            return await ctx.send("Took too long to answer!")
-
-        try:
-            channel = await ctx.guild.create_voice_channel(channel_msg.content, category=new_cat)
-
-            await self.bot.db["voice_guilds"].update_one(
-                {"guild_id": ctx.guild.id},
-                {
-                    "$set": {
-                        "guild_id": ctx.guild.id,
-                        "owner_id": ctx.author.id,
-                        "voice_channel_id": channel.id,
-                        "voice_category_id": new_cat.id,
-                    }
-                },
-                upsert=True,
-            )
-            await ctx.send("**You are all setup and ready to go!**")
-        except Exception:
-            await ctx.send("You didn't enter the names properly.\nUse the setup command again!")
+        await ctx.send("**Click the button below to start the setup!**", view=SetupView(self.bot))
 
     @setup.error
     async def setup_error(self, ctx, error):
         self.bot.logger.error(f"[Voice] Setup error: {error}")
 
-    @commands.command()
+    @commands.command(name="setlimit", description="Set the default channel limit for the server.")
     async def setlimit(self, ctx: commands.Context, num: int):
-        """Set the default channel limit for the server (server owner only)."""
-        if ctx.author.id != ctx.guild.owner_id and ctx.author.id not in self.bot.owner_ids:
-            return await ctx.send(f"{ctx.author.mention} only the owner of the server can setup the bot!")
+        if not ctx.author.guild_permissions.administrator:
+            return await ctx.send(f"{ctx.author.mention} only server administrators can setup the bot!")
 
         await self.bot.db["voice_guild_settings"].update_one(
             {"guild_id": ctx.guild.id},
@@ -91,9 +53,8 @@ class Voice(Cog):
         )
         await ctx.send("You have changed the default channel limit for your server!")
 
-    @voice.command()
+    @voice.command(name="lock", description="Lock your voice channel.")
     async def lock(self, ctx: commands.Context):
-        """Lock your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -102,9 +63,8 @@ class Voice(Cog):
         await channel.set_permissions(ctx.guild.default_role, connect=False)
         await ctx.send(f"{ctx.author.mention} Voice chat locked! 🔒")
 
-    @voice.command()
+    @voice.command(name="unlock", description="Unlock your voice channel.")
     async def unlock(self, ctx: commands.Context):
-        """Unlock your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -113,9 +73,8 @@ class Voice(Cog):
         await channel.set_permissions(ctx.guild.default_role, connect=True)
         await ctx.send(f"{ctx.author.mention} Voice chat unlocked! 🔓")
 
-    @voice.command(aliases=["allow"])
+    @voice.command(name="permit", description="Permit a user to join your voice channel.", aliases=["allow"])
     async def permit(self, ctx: commands.Context, member: discord.Member):
-        """Permit a user to join your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -124,9 +83,8 @@ class Voice(Cog):
         await channel.set_permissions(member, connect=True)
         await ctx.send(f"{ctx.author.mention} You have permitted {member.name} to have access to the channel. ✅")
 
-    @voice.command(aliases=["deny"])
+    @voice.command(name="reject", description="Reject a user from your voice channel.", aliases=["deny"])
     async def reject(self, ctx: commands.Context, member: discord.Member):
-        """Reject a user from your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -145,9 +103,8 @@ class Voice(Cog):
         await channel.set_permissions(member, connect=False, read_messages=True)
         await ctx.send(f"{ctx.author.mention} You have rejected {member.name} from accessing the channel. ❌")
 
-    @voice.command()
+    @voice.command(name="limit", description="Set the user limit for your voice channel.")
     async def limit(self, ctx: commands.Context, limit: int):
-        """Set the user limit for your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -171,9 +128,8 @@ class Voice(Cog):
             upsert=True,
         )
 
-    @voice.command()
+    @voice.command(name="name", description="Rename your voice channel.")
     async def name(self, ctx: commands.Context, *, name: str):
-        """Rename your voice channel."""
         doc = await self.bot.db["voice_channels"].find_one({"user_id": ctx.author.id})
         if doc is None:
             return await ctx.send(f"{ctx.author.mention} You don't own a channel.")
@@ -197,9 +153,8 @@ class Voice(Cog):
             upsert=True,
         )
 
-    @voice.command()
+    @voice.command(name="claim", description="Claim ownership of the voice channel if the owner has left.")
     async def claim(self, ctx: commands.Context):
-        """Claim ownership of the voice channel if the owner has left."""
         if not ctx.author.voice or not ctx.author.voice.channel:
             return await ctx.send(f"{ctx.author.mention} you're not in a voice channel.")
 

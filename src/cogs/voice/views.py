@@ -1,4 +1,6 @@
 import discord
+from core.bot import MyBot
+import config
 
 from .ui import (
     RenameModal,
@@ -13,7 +15,7 @@ from .ui import (
 class ChannelSettingsSelect(discord.ui.Select):
     """Dropdown for channel settings: Name, Limit, Status, Game, LFM, Bitrate, Region, Text, NSFW, Claim."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: MyBot):
         self.bot = bot
         options = [
             discord.SelectOption(label="Name", description="Change the channel name", emoji="📝"),
@@ -205,7 +207,7 @@ class ChannelPermissionsSelect(discord.ui.Select):
 class VoiceDropdownView(discord.ui.View):
     """Persistent view with settings & permissions dropdowns + utility buttons."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: MyBot):
         super().__init__(timeout=None)
         self.bot = bot
         self.add_item(ChannelSettingsSelect(self.bot))
@@ -215,7 +217,7 @@ class VoiceDropdownView(discord.ui.View):
                 label="Dashboard",
                 style=discord.ButtonStyle.secondary,
                 emoji="🔗",
-                url="https://www.codersforcoders.xyz",
+                url=config.bot.website,
             )
         )
 
@@ -277,3 +279,15 @@ class VoiceDropdownView(discord.ui.View):
                 await interaction.followup.send(
                     "The owner is still here!", ephemeral=True
                 )
+
+class SetupView(discord.ui.View):
+    def __init__(self, bot: MyBot):
+        super().__init__(timeout=60)
+        self.bot = bot
+
+    @discord.ui.button(label="Start Setup", style=discord.ButtonStyle.primary)
+    async def start_setup(self, interaction: discord.Interaction, button: discord.ui.Button):
+        from .ui import SetupModal
+        if not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("Only administrators cansetup the bot!", ephemeral=True)
+        await interaction.response.send_modal(SetupModal(self.bot))
